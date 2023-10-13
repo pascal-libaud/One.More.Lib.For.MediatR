@@ -9,7 +9,7 @@ As the name suggests, a new library that extends MediatR with integrated Pipelin
 
 ## Installing One.More.Lib.For.MediatR
 
-// TODO add a link to the nuget page.
+[Link to the nuget package](https://www.nuget.org/packages/One.More.Lib.For.MediatR/ "nuget package")
 
 We recommend using NuGet:
 ```
