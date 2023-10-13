@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+	  <Description>One more library for MediatR. It allows you to configure the most commonly used PipelineBehaviors in a very simple way.</Description>
+	  <Authors>Pascal LIBAUD</Authors>
+	  <Company></Company>
+	  <PackageReadmeFile>readme.md</PackageReadmeFile>
+	  <Title>One more lib to extend MediatR</Title>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageTags>MediatR;PipelineBehaviors;Extensions;Polly;Retry Pattern;FluentValidation;MemoryCache;Performance</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.7.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.7.1" />
+    <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+    <PackageReference Include="Polly" Version="8.0.0" />
+
+    <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
