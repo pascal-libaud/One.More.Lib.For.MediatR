@@ -30,4 +30,4 @@ jobs:
       working-directory: ./src
 
     - name: Push package to NuGet.org
-      run: dotnet nuget push ../packages/One.More.Lib.For.MediatR.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_PACKAGES }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./packages/One.More.Lib.For.MediatR.${{ github.event.inputs.version }}.nupkg --api-key ${{ secrets.NUGET_PACKAGES }} --source https://api.nuget.org/v3/index.json
