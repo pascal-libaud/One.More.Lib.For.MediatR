@@ -1,0 +1,29 @@
+name: Automatic publish NuGet package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./src
+
+    - name: Build package
+      run: dotnet pack -c Release --output ../packages /p:Version=${{ github.event.release.tag_name }}
+      working-directory: ./src
+
+    - name: Push package to NuGet.org
+      run: dotnet nuget push ../packages/One.More.Lib.For.MediatR.${{ github.event.release.tag_name }}.nupkg --api-key ${{ secrets.NUGET_PACKAGES }} --source https://api.nuget.org/v3/index.json
