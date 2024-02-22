@@ -24,7 +24,7 @@ namespace One.More.Lib.For.MediatR
             {
                 services.AddMemoryCache();
 
-                services.AddSingleton(new MemoryCachePipelineBehaviorConfiguration
+                services.AddSingleton(new MemoryCacheConfiguration
                 {
                     AbsoluteExpiration = serviceConfig.AbsoluteExpiration,
                     AbsoluteExpirationRelativeToNow = serviceConfig.AbsoluteExpirationRelativeToNow,
@@ -44,7 +44,7 @@ namespace One.More.Lib.For.MediatR
 
             if (serviceConfig.RetrySupport)
             {
-                services.AddSingleton(new RetryPipelineBehaviorConfiguration
+                services.AddSingleton(new RetryConfiguration
                 {
                     RetryCount = serviceConfig.RetryCount,
                     RetryDelay = serviceConfig.RetryDelay

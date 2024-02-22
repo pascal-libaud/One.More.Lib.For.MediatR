@@ -15,7 +15,7 @@ namespace One.More.Lib.For.MediatR
         public int? RetryDelay { get; set; }
     }
 
-    internal class RetryPipelineBehaviorConfiguration
+    internal class RetryConfiguration
     {
         internal int RetryCount { get; set; }
         internal int RetryDelay { get; set; }
@@ -24,9 +24,9 @@ namespace One.More.Lib.For.MediatR
     internal class RetryPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
         private readonly ILogger<RetryPipelineBehavior<TRequest, TResponse>> _logger;
-        private readonly RetryPipelineBehaviorConfiguration _configuration;
+        private readonly RetryConfiguration _configuration;
 
-        public RetryPipelineBehavior(ILogger<RetryPipelineBehavior<TRequest, TResponse>> logger, RetryPipelineBehaviorConfiguration configuration)
+        public RetryPipelineBehavior(ILogger<RetryPipelineBehavior<TRequest, TResponse>> logger, RetryConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
