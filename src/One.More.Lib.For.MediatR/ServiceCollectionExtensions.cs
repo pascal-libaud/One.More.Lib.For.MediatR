@@ -13,11 +13,11 @@ namespace One.More.Lib.For.MediatR
 
             configuration(serviceConfig);
 
-            if (serviceConfig.PerformanceSupport)
+            if (serviceConfig.PerformanceLoggerSupport)
             {
-                services.AddSingleton(new PerformancePipelineBehaviorConfiguration { TriggerThreshold = serviceConfig.TriggerThreshold });
+                services.AddSingleton(new PerformanceLoggerConfiguration { TriggerThreshold = serviceConfig.TriggerThreshold });
 
-                services.Add(new ServiceDescriptor(typeof(IPipelineBehavior<,>), typeof(PerformancePipelineBehavior<,>), serviceConfig.Lifetime));
+                services.Add(new ServiceDescriptor(typeof(IPipelineBehavior<,>), typeof(PerformanceLoggerPipelineBehavior<,>), serviceConfig.Lifetime));
             }
 
             if (serviceConfig.MemoryCacheSupport)

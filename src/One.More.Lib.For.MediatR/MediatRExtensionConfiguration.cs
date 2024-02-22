@@ -11,13 +11,13 @@ namespace One.More.Lib.For.MediatR
     {
         public ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient;
 
-        public bool PerformanceSupport { get; set; } = false;
+        public bool PerformanceLoggerSupport { get; set; } = false;
 
         public int TriggerThreshold { get; set; } = 0;
 
-        public MediatRExtensionConfiguration AddPerformanceSupport(int triggerThreshold = 0)
+        public MediatRExtensionConfiguration AddPerformanceLoggerSupport(int triggerThreshold = 0)
         {
-            PerformanceSupport = true;
+            PerformanceLoggerSupport = true;
             TriggerThreshold = triggerThreshold;
             return this;
         }

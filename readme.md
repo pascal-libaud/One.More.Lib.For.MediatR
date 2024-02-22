@@ -2,7 +2,7 @@ One More Lib For MediatR
 ========================
 
 As the name suggests, a new library that extends MediatR with integrated PipelineBehavior :
-- Performance
+- Performance Logger
 - MemoryCache
 - Validation with FluentValidation
 - Retry Pattern with Polly
@@ -20,18 +20,18 @@ Or via the .NET Core command line interface:
 dotnet add package One.More.Lib.For.MediatR
 ```
 
-## Performance PipelineBehavior
+## Performance Logger PipelineBehavior
 
 ### How to configure it?
 
 The simplest way:
 ```csharp
-builder.Services.AddMediatRExtensions(configuration => configuration.PerformanceSupport = true);
+builder.Services.AddMediatRExtensions(configuration => configuration.PerformanceLoggerSupport = true);
 ```
 
 If you want to configure it:
 ```csharp
-builder.Services.AddMediatRExtensions(configuration => configuration.AddPerformanceSupport(500));
+builder.Services.AddMediatRExtensions(configuration => configuration.AddPerformanceLoggerSupport(500));
 ```
 
 ### How yo use it?

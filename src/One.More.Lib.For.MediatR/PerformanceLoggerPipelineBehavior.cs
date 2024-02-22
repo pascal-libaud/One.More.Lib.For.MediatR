@@ -6,17 +6,17 @@ using Microsoft.Extensions.Logging;
 
 namespace One.More.Lib.For.MediatR
 {
-    internal class PerformancePipelineBehaviorConfiguration
+    internal class PerformanceLoggerConfiguration
     {
         internal int TriggerThreshold { get; set; }
     }
 
-    internal class PerformancePipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    internal class PerformanceLoggerPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
-        private readonly ILogger<PerformancePipelineBehavior<TRequest, TResponse>> _logger;
-        private readonly PerformancePipelineBehaviorConfiguration _configuration;
+        private readonly ILogger<PerformanceLoggerPipelineBehavior<TRequest, TResponse>> _logger;
+        private readonly PerformanceLoggerConfiguration _configuration;
 
-        public PerformancePipelineBehavior(ILogger<PerformancePipelineBehavior<TRequest, TResponse>> logger, PerformancePipelineBehaviorConfiguration configuration)
+        public PerformanceLoggerPipelineBehavior(ILogger<PerformanceLoggerPipelineBehavior<TRequest, TResponse>> logger, PerformanceLoggerConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
