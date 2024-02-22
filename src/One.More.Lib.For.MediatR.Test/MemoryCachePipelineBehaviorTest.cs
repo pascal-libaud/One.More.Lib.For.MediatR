@@ -1,7 +1,3 @@
-using FluentAssertions;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace One.More.Lib.For.MediatR.Test;
 
 public class MemoryCachePipelineBehaviorTest
