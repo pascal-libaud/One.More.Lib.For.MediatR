@@ -1,5 +1,4 @@
 using FluentValidation;
-using MediatR;
 
 namespace One.More.Lib.For.MediatR.Test;
 
