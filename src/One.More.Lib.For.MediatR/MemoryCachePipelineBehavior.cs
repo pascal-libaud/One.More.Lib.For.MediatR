@@ -13,7 +13,7 @@ namespace One.More.Lib.For.MediatR
         public bool IsActive { get; set; } = true;
     }
 
-    internal class MemoryCachePipelineBehaviorConfiguration
+    internal class MemoryCacheConfiguration
     {
         internal DateTimeOffset? AbsoluteExpiration { get; set; }
 
@@ -27,9 +27,9 @@ namespace One.More.Lib.For.MediatR
     internal class MemoryCachePipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly MemoryCachePipelineBehaviorConfiguration _configuration;
+        private readonly MemoryCacheConfiguration _configuration;
 
-        public MemoryCachePipelineBehavior(IMemoryCache memoryCache, MemoryCachePipelineBehaviorConfiguration configuration)
+        public MemoryCachePipelineBehavior(IMemoryCache memoryCache, MemoryCacheConfiguration configuration)
         {
             _memoryCache = memoryCache;
             _configuration = configuration;
