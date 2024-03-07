@@ -5,74 +5,73 @@ using FluentValidation;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace One.More.Lib.For.MediatR
+namespace One.More.Lib.For.MediatR;
+
+public class MediatRExtensionConfiguration
 {
-    public class MediatRExtensionConfiguration
+    public ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient;
+
+    public bool PerformanceLoggerSupport { get; set; } = false;
+
+    public int TriggerThreshold { get; set; } = 0;
+
+    public MediatRExtensionConfiguration AddPerformanceLoggerSupport(int triggerThreshold = 0)
     {
-        public ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient;
+        PerformanceLoggerSupport = true;
+        TriggerThreshold = triggerThreshold;
+        return this;
+    }
 
-        public bool PerformanceLoggerSupport { get; set; } = false;
+    public bool MemoryCacheSupport { get; set; } = false;
 
-        public int TriggerThreshold { get; set; } = 0;
+    internal DateTimeOffset? AbsoluteExpiration { get; private set; }
 
-        public MediatRExtensionConfiguration AddPerformanceLoggerSupport(int triggerThreshold = 0)
-        {
-            PerformanceLoggerSupport = true;
-            TriggerThreshold = triggerThreshold;
-            return this;
-        }
+    internal TimeSpan? AbsoluteExpirationRelativeToNow { get; private set; }
 
-        public bool MemoryCacheSupport { get; set; } = false;
+    internal TimeSpan? SlidingExpiration { get; private set; }
 
-        internal DateTimeOffset? AbsoluteExpiration { get; private set; }
+    internal CacheItemPriority Priority { get; private set; }
 
-        internal TimeSpan? AbsoluteExpirationRelativeToNow { get; private set; }
+    public MediatRExtensionConfiguration AddMemoryCacheSupport(DateTimeOffset? absoluteExpiration = null, TimeSpan? absoluteExpirationRelativeToNow = null, TimeSpan? slidingExpiration = null, CacheItemPriority priority = CacheItemPriority.Normal)
+    {
+        MemoryCacheSupport = true;
+        AbsoluteExpiration = absoluteExpiration;
+        AbsoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow;
+        SlidingExpiration = slidingExpiration;
+        Priority = priority;
 
-        internal TimeSpan? SlidingExpiration { get; private set; }
+        return this;
+    }
 
-        internal CacheItemPriority Priority { get; private set; }
-
-        public MediatRExtensionConfiguration AddMemoryCacheSupport(DateTimeOffset? absoluteExpiration = null, TimeSpan? absoluteExpirationRelativeToNow = null, TimeSpan? slidingExpiration = null, CacheItemPriority priority = CacheItemPriority.Normal)
-        {
-            MemoryCacheSupport = true;
-            AbsoluteExpiration = absoluteExpiration;
-            AbsoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow;
-            SlidingExpiration = slidingExpiration;
-            Priority = priority;
-
-            return this;
-        }
-
-        internal bool FluentValidationSupport { get; set; } = false;
+    internal bool FluentValidationSupport { get; set; } = false;
         
-        internal IEnumerable<Assembly> Assemblies { get; private set; } = new List<Assembly>();
+    internal IEnumerable<Assembly> Assemblies { get; private set; } = new List<Assembly>();
 
-        internal Func<AssemblyScanner.AssemblyScanResult, bool> Filter { get; private set; } = null;
+    internal Func<AssemblyScanner.AssemblyScanResult, bool> Filter { get; private set; } = null;
         
-        internal bool IncludeInternalTypes { get; private set; } = false;
+    internal bool IncludeInternalTypes { get; private set; } = false;
 
-        public MediatRExtensionConfiguration AddFluentValidationSupport(IEnumerable<Assembly> assemblies, Func<AssemblyScanner.AssemblyScanResult, bool> filter = null, bool includeInternalTypes = false)
-        {
-            FluentValidationSupport = true;
-            Assemblies = assemblies;
-            Filter = filter;
-            IncludeInternalTypes = includeInternalTypes;
+    public MediatRExtensionConfiguration AddFluentValidationSupport(IEnumerable<Assembly> assemblies, Func<AssemblyScanner.AssemblyScanResult, bool> filter = null, bool includeInternalTypes = false)
+    {
+        FluentValidationSupport = true;
+        Assemblies = assemblies;
+        Filter = filter;
+        IncludeInternalTypes = includeInternalTypes;
 
-            return this;
-        }
+        return this;
+    }
 
-        public bool RetrySupport { get; set; } = false;
+    public bool RetrySupport { get; set; } = false;
 
-        public int RetryCount { get; set; } = 5;
+    public int RetryCount { get; set; } = 3;
 
-        public int RetryDelay { get; set; } = 500;
+    public int RetryDelay { get; set; } = 500;
 
-        public MediatRExtensionConfiguration AddRetrySupport(int? retryCount = null, int? retryDelay = null)
-        {
-            RetrySupport = true;
-            RetryCount = retryCount ?? RetryCount;
-            RetryDelay = retryDelay ?? RetryDelay;
-            return this;
-        }
+    public MediatRExtensionConfiguration AddRetrySupport(int? retryCount = null, int? retryDelay = null)
+    {
+        RetrySupport = true;
+        RetryCount = retryCount ?? RetryCount;
+        RetryDelay = retryDelay ?? RetryDelay;
+        return this;
     }
 }

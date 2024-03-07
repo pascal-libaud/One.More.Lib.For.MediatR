@@ -13,8 +13,8 @@ public class MemoryCachePipelineBehaviorTest
             .GetRequiredService<Counter>(out var counter)
             .GetMediator();
 
-        _ = await mediator.Send(new MemoryQuery(1));
-        _ = await mediator.Send(new MemoryQuery(1));
+        _ = await mediator.Send(new MemoryRequest(1));
+        _ = await mediator.Send(new MemoryRequest(1));
 
         counter.Count.Should().Be(2);
     }
@@ -30,13 +30,13 @@ public class MemoryCachePipelineBehaviorTest
             .GetRequiredService<Counter>(out var counter)
             .GetMediator();
 
-        _ = await mediator.Send(new MemoryQuery(1));
-        _ = await mediator.Send(new MemoryQuery(2));
+        _ = await mediator.Send(new MemoryRequest(1));
+        _ = await mediator.Send(new MemoryRequest(2));
 
         counter.Count.Should().Be(2);
 
-        _ = await mediator.Send(new MemoryQuery(1));
-        _ = await mediator.Send(new MemoryQuery(2));
+        _ = await mediator.Send(new MemoryRequest(1));
+        _ = await mediator.Send(new MemoryRequest(2));
 
         counter.Count.Should().Be(2);
     }
@@ -52,11 +52,11 @@ public class MemoryCachePipelineBehaviorTest
             .GetRequiredService<Counter>(out var counter)
             .GetMediator();
 
-        _ = await mediator.Send(new NoMemoryQuery(1));
-        _ = await mediator.Send(new NoMemoryQuery(2));
+        _ = await mediator.Send(new NoMemoryRequest(1));
+        _ = await mediator.Send(new NoMemoryRequest(2));
 
-        _ = await mediator.Send(new NoMemoryQuery(1));
-        _ = await mediator.Send(new NoMemoryQuery(2));
+        _ = await mediator.Send(new NoMemoryRequest(1));
+        _ = await mediator.Send(new NoMemoryRequest(2));
 
         counter.Count.Should().Be(4);
     }
@@ -68,36 +68,36 @@ public class Counter
 }
 
 [MemoryCache]
-public record MemoryQuery(int Parameter) : IRequest<int>;
+public record MemoryRequest(int Parameter) : IRequest<int>;
 
-public class MemoryQueryHandler : IRequestHandler<MemoryQuery, int>
+public class MemoryRequestHandler : IRequestHandler<MemoryRequest, int>
 {
     private readonly Counter _counter;
 
-    public MemoryQueryHandler(Counter counter)
+    public MemoryRequestHandler(Counter counter)
     {
         _counter = counter;
     }
 
-    public Task<int> Handle(MemoryQuery request, CancellationToken cancellationToken)
+    public Task<int> Handle(MemoryRequest request, CancellationToken cancellationToken)
     {
         _counter.Count++;
         return Task.FromResult(request.Parameter);
     }
 }
 
-public record NoMemoryQuery(int Parameter) : IRequest<int>;
+public record NoMemoryRequest(int Parameter) : IRequest<int>;
 
-public class NoMemoryQueryHandler : IRequestHandler<NoMemoryQuery, int>
+public class NoMemoryRequestHandler : IRequestHandler<NoMemoryRequest, int>
 {
     private readonly Counter _counter;
 
-    public NoMemoryQueryHandler(Counter counter)
+    public NoMemoryRequestHandler(Counter counter)
     {
         _counter = counter;
     }
 
-    public Task<int> Handle(NoMemoryQuery request, CancellationToken cancellationToken)
+    public Task<int> Handle(NoMemoryRequest request, CancellationToken cancellationToken)
     {
         _counter.Count++;
         return Task.FromResult(request.Parameter);

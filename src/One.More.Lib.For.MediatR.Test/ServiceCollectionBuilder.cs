@@ -36,6 +36,14 @@ public static class ServiceCollectionBuilder
             return services;
     }
 
+    public static IServiceCollection ConfigureRetry(this IServiceCollection services, bool active = true)
+    {
+        if (active)
+            return services.AddMediatRExtensions(cfg => cfg.AddRetrySupport(retryDelay: 50));
+        else
+            return services;
+    }
+
     public static IMediator GetMediator(this ServiceProvider serviceProvider)
     {
         return serviceProvider.GetRequiredService<IMediator>();

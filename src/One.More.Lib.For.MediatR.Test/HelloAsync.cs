@@ -29,4 +29,3 @@ public class HelloAsyncValidator : AbstractValidator<HelloAsync>
             });
     }
 }
-
