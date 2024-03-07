@@ -12,16 +12,16 @@ public class PerformanceLoggerPipelineBehaviorTest
             .ConfigurePerformanceLogger()
             .AddSingleton(typeof(ILogger<>), typeof(SpyLogger<>))
             .BuildServiceProvider()
-            .GetRequiredService<ILogger<PerformanceLoggerPipelineBehavior<DelayQuery, bool>>>(out var loggerOfT)
+            .GetRequiredService<ILogger<PerformanceLoggerPipelineBehavior<DelayRequest, bool>>>(out var loggerOfT)
             .GetMediator();
 
-        var delay = await mediator.Send(new DelayQuery(300));
+        var delay = await mediator.Send(new DelayRequest(300));
         delay.Should().Be(true);
 
         loggerOfT.Should().NotBeNull();
         loggerOfT.Should().BeAssignableTo<SpyLogger>()
             .Which.Logs.Should().HaveCount(1)
-            .And.Subject.First().Should().StartWith("Handled DelayQuery in");
+            .And.Subject.First().Should().StartWith($"Handled {nameof(DelayRequest)} in");
     }
 
     [Fact]
@@ -32,10 +32,10 @@ public class PerformanceLoggerPipelineBehaviorTest
             .ConfigurePerformanceLogger(active: false)
             .AddSingleton(typeof(ILogger<>), typeof(SpyLogger<>))
             .BuildServiceProvider()
-            .GetRequiredService<ILogger<PerformanceLoggerPipelineBehavior<DelayQuery, bool>>>(out var loggerOfT)
+            .GetRequiredService<ILogger<PerformanceLoggerPipelineBehavior<DelayRequest, bool>>>(out var loggerOfT)
             .GetMediator();
 
-        var delay = await mediator.Send(new DelayQuery(300));
+        var delay = await mediator.Send(new DelayRequest(300));
         delay.Should().Be(true);
 
         loggerOfT.Should().NotBeNull();
@@ -50,47 +50,53 @@ public class PerformanceLoggerPipelineBehaviorTest
             .ConfigurePerformanceLogger()
             .AddSingleton(typeof(ILogger<>), typeof(SpyLogger<>))
             .BuildServiceProvider()
-            .GetRequiredService<ILogger<PerformanceLoggerPipelineBehavior<DelayQuery, bool>>>(out var loggerOfT)
+            .GetRequiredService<ILogger<PerformanceLoggerPipelineBehavior<DelayRequest, bool>>>(out var loggerOfT)
             .GetMediator();
 
-        var delay = await mediator.Send(new DelayQuery(0));
+        var delay = await mediator.Send(new DelayRequest(0));
         delay.Should().Be(true);
 
         loggerOfT.Should().NotBeNull();
         loggerOfT.Should().BeAssignableTo<SpyLogger>().Which.Logs.Should().HaveCount(0);
     }
+
+    [Fact]
+    public async Task Performance_logger_pipeline_behavior_should_work_with_requests_with_no_return_value()
+    {
+        var mediator = ServiceCollectionBuilder.CreateServiceCollection()
+            .ConfigureMediatR()
+            .ConfigurePerformanceLogger()
+            .AddSingleton(typeof(ILogger<>), typeof(SpyLogger<>))
+            .BuildServiceProvider()
+            .GetRequiredService<ILogger<PerformanceLoggerPipelineBehavior<DelayVoidRequest, Unit>>>(out var loggerOfT)
+            .GetMediator();
+
+        await mediator.Send(new DelayVoidRequest(300));
+
+        loggerOfT.Should().NotBeNull();
+        loggerOfT.Should().BeAssignableTo<SpyLogger>()
+            .Which.Logs.Should().HaveCount(1)
+            .And.Subject.First().Should().StartWith($"Handled {nameof(DelayVoidRequest)} in ");
+    }
 }
 
-public record DelayQuery(int DelayInMilliseconds) : IRequest<bool>;
+public record DelayRequest(int DelayInMilliseconds) : IRequest<bool>;
 
-public class DelayQueryHandler : IRequestHandler<DelayQuery, bool>
+public class DelayRequestHandler : IRequestHandler<DelayRequest, bool>
 {
-    public async Task<bool> Handle(DelayQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DelayRequest request, CancellationToken cancellationToken)
     {
         await Task.Delay(request.DelayInMilliseconds, cancellationToken);
         return true;
     }
 }
 
-public class SpyLogger : ILogger
+public record DelayVoidRequest(int DelayInMilliseconds) : IRequest;
+
+public class DelayVoidRequestHandler : IRequestHandler<DelayVoidRequest>
 {
-    private readonly List<string> _logs = new();
-    public IReadOnlyList<string> Logs => _logs;
-
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    public async Task Handle(DelayVoidRequest request, CancellationToken cancellationToken)
     {
-        _logs.Add(formatter(state, null));
-    }
-
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        return true;
-    }
-
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-    {
-        return null;
+        await Task.Delay(request.DelayInMilliseconds, cancellationToken);
     }
 }
-
-public class SpyLogger<T> : SpyLogger, ILogger<T>;

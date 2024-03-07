@@ -79,4 +79,21 @@ public class FluentValidationPipeBehaviorTest
         errors[0].PropertyName.Should().Be(nameof(Hello.Message));
     }
 
+    [Fact]
+    public async Task Fluent_validation_pipeline_behavior_should_work_with_requests_with_no_return_value()
+    {
+        var mediator = ServiceCollectionBuilder.CreateServiceCollection()
+            .ConfigureMediatR()
+            .ConfigureFluentValidation()
+            .BuildServiceProvider()
+            .GetMediator();
+
+        var sendHello = () => mediator.Send(new VoidRequest(""));
+        var errors = (await sendHello.Should().ThrowAsync<ValidationException>())
+            .And
+            .Errors.ToList();
+
+        errors.Count.Should().Be(1);
+        errors[0].PropertyName.Should().Be(nameof(VoidRequest.Message));
+    }
 }
