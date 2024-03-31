@@ -1,7 +1,9 @@
+
 One More Lib For MediatR
 ========================
+[![CI](https://github.com/pascal-libaud/One.More.Lib.For.MediatR/actions/workflows/ci.yml/badge.svg)](https://github.com/pascal-libaud/One.More.Lib.For.MediatR/actions/workflows/ci.yml) [![NuGet](https://img.shields.io/nuget/v/One.More.Lib.For.MediatR.svg)](https://www.nuget.org/packages/One.More.Lib.For.MediatR/)
 
-As the name suggests, a new library that extends MediatR with integrated PipelineBehavior :
+As the name suggests, a new library that extends MediatR with integrated PipelineBehavior:
 - Performance Logger
 - MemoryCache
 - Validation with FluentValidation
@@ -63,6 +65,14 @@ public class GetUserByName : IRequest<User?>
 }
 ```
 
+Or you can configure more option request by request.
+```csharp
+[MemoryCache(Absolute)]
+public class GetUserByName : IRequest<User?>
+{
+    public string Name { get; set; }
+}
+```
 ##  Validation with FluentValidation
 
 ### How to configure it?
@@ -95,6 +105,23 @@ Just add [RetryPolicy] attribute on requests classes or records.
 
 ```csharp
 [RetryPolicy]
+public class GetUserByName : IRequest<User?>
+{
+    public string Name { get; set; }
+}
+```
+Or you can override default values by passing them in the RetryPolicy Attribute
+
+```csharp
+[RetryPolicy(OverrideRetryCount = true, RetryCount = 5)]
+public class GetUserByName : IRequest<User?>
+{
+    public string Name { get; set; }
+}
+```
+
+```csharp
+[RetryPolicy(OverrideRetryDelay = true, RetryDelay = 200)]
 public class GetUserByName : IRequest<User?>
 {
     public string Name { get; set; }
