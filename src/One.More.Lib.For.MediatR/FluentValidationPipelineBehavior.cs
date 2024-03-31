@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AsyncLinqR;
 using FluentValidation;
-using One.More.Lib.For.Linq;
 using MediatR;
 
 namespace One.More.Lib.For.MediatR;
@@ -19,10 +19,10 @@ internal class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipeline
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        var failures = await _validators.OmSelectAsync(v => v.ValidateAsync(request, cancellationToken))
-            .OmSelectManyAsync(result => result.Errors)
-            .OmWhereAsync(f => f != null)
-            .OmToListAsync();
+        var failures = await _validators.SelectAsync(v => v.ValidateAsync(request, cancellationToken))
+            .SelectManyAsync(result => result.Errors)
+            .WhereAsync(f => f != null, cancellationToken)
+            .ToListAsync(cancellationToken);
 
         if (failures.Any())
             throw new ValidationException(failures);
