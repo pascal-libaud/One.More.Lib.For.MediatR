@@ -11,6 +11,14 @@ namespace One.More.Lib.For.MediatR;
 public class MemoryCacheAttribute : Attribute
 {
     public bool IsActive { get; set; } = true;
+
+    public DateTimeOffset? AbsoluteExpiration { get; set; }
+
+    public TimeSpan? AbsoluteExpirationRelativeToNow { get; set; }
+
+    public TimeSpan? SlidingExpiration { get; set; }
+    
+    public CacheItemPriority? Priority { get; set; }
 }
 
 internal class MemoryCacheConfiguration
@@ -47,10 +55,10 @@ internal class MemoryCachePipelineBehavior<TRequest, TResponse> : IPipelineBehav
             result = await next();
             _memoryCache.Set(request, result, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = _configuration.AbsoluteExpiration,
-                AbsoluteExpirationRelativeToNow = _configuration.AbsoluteExpirationRelativeToNow,
-                SlidingExpiration = _configuration.SlidingExpiration,
-                Priority = _configuration.Priority,
+                AbsoluteExpiration = memoryPolicy.AbsoluteExpiration ?? _configuration.AbsoluteExpiration,
+                AbsoluteExpirationRelativeToNow = memoryPolicy.AbsoluteExpirationRelativeToNow ?? _configuration.AbsoluteExpirationRelativeToNow,
+                SlidingExpiration = memoryPolicy.SlidingExpiration ?? _configuration.SlidingExpiration,
+                Priority = memoryPolicy.Priority ?? _configuration.Priority,
             });
         }
 
