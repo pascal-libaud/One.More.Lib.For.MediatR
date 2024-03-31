@@ -11,6 +11,8 @@ namespace One.More.Lib.For.MediatR;
 public class MemoryCacheAttribute : Attribute
 {
     public bool IsActive { get; set; } = true;
+
+    // TODO Override des propriétés de MemoryCacheConfiguration
 }
 
 internal class MemoryCacheConfiguration

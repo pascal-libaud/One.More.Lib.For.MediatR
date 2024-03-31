@@ -4,8 +4,10 @@ namespace One.More.Lib.For.MediatR.Test;
 
 public class RetryPipelineBehaviorTest
 {
-    private const string _logRetryQuery = $"Failed to execute handler for {nameof(RetryRequest)}, retrying after";
-    private const string _logRetryVoidRequest = $"Failed to execute handler for {nameof(RetryVoidRequest)}, retrying after";
+    private static string GetLog<T>()
+    {
+        return $"Failed to execute handler for {typeof(T).Name}, retrying after";
+    }
 
     [Fact]
     public async Task RetryQueryHandler_should_work_as_expected()
@@ -41,7 +43,7 @@ public class RetryPipelineBehaviorTest
         loggerOfT.Should().NotBeNull();
         loggerOfT.Should().BeAssignableTo<SpyLogger>()
             .Which.Logs.Should().HaveCount(2)
-            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(_logRetryQuery));
+            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(GetLog<RetryRequest>()));
     }
 
     [Fact]
@@ -80,7 +82,7 @@ public class RetryPipelineBehaviorTest
         loggerOfT.Should().NotBeNull();
         loggerOfT.Should().BeAssignableTo<SpyLogger>()
             .Which.Logs.Should().HaveCount(3)
-            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(_logRetryQuery));
+            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(GetLog<RetryRequest>()));
     }
 
     [Fact]
@@ -100,7 +102,7 @@ public class RetryPipelineBehaviorTest
         loggerOfT.Should().NotBeNull();
         loggerOfT.Should().BeAssignableTo<SpyLogger>()
             .Which.Logs.Should().HaveCount(3)
-            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(_logRetryQuery));
+            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(GetLog<RetryRequest>()));
     }
 
     [Fact]
@@ -120,7 +122,27 @@ public class RetryPipelineBehaviorTest
         loggerOfT.Should().NotBeNull();
         loggerOfT.Should().BeAssignableTo<SpyLogger>()
             .Which.Logs.Should().HaveCount(2)
-            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(_logRetryVoidRequest));
+            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(GetLog<RetryVoidRequest>()));
+    }
+
+    [Fact]
+    public async Task Retry_pipeline_behavior_should_take_account_of_retry_policy_properties()
+    {
+        var mediator = ServiceCollectionBuilder.CreateServiceCollection()
+            .ConfigureMediatR()
+            .ConfigureRetry()
+            .AddSingleton(typeof(ILogger<>), typeof(SpyLogger<>))
+            .BuildServiceProvider()
+            .GetRequiredService<ILogger<RetryPipelineBehavior<RetryWithOverrideRequest, int>>>(out var loggerOfT)
+            .GetMediator();
+
+        var func = () => mediator.Send(new RetryWithOverrideRequest { CountExceptions = 3 });
+        await func.Should().ThrowAsync<RetryException>();
+
+        loggerOfT.Should().NotBeNull();
+        loggerOfT.Should().BeAssignableTo<SpyLogger>()
+            .Which.Logs.Should().HaveCount(1)
+            .And.Subject.Should().AllSatisfy(x => x.Should().StartWith(GetLog<RetryWithOverrideRequest>()));
     }
 }
 
@@ -158,5 +180,21 @@ public class RetryVoidRequestHandler : IRequestHandler<RetryVoidRequest>
     }
 }
 
+[RetryPolicy(OverrideRetryCount = true, RetryCount = 1)]
+public class RetryWithOverrideRequest : IRequest<int>
+{
+    public required int CountExceptions { get; set; }
+}
+
+public class RetryWithOverrideRequestHandler : IRequestHandler<RetryWithOverrideRequest, int>
+{
+    public Task<int> Handle(RetryWithOverrideRequest request, CancellationToken cancellationToken)
+    {
+        if (request.CountExceptions-- > 0)
+            throw new RetryException();
+
+        return Task.FromResult(request.CountExceptions);
+    }
+}
 
 public class RetryException : Exception;

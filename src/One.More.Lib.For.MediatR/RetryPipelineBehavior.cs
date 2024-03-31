@@ -11,8 +11,11 @@ namespace One.More.Lib.For.MediatR;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
 public class RetryPolicyAttribute : Attribute
 {
-    public int? RetryCount { get; set; }
-    public int? RetryDelay { get; set; }
+    public bool OverrideRetryCount { get; set; }
+    public int RetryCount { get; set; }
+
+    public bool OverrideRetryDelay { get; set; }
+    public int RetryDelay { get; set; }
 }
 
 internal class RetryConfiguration
@@ -39,10 +42,10 @@ internal class RetryPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
         if (retryPolicy == null)
             return await next();
 
-        Func<int, TimeSpan> sleepDurationProvider = i => TimeSpan.FromMilliseconds(i * (retryPolicy.RetryDelay ?? _configuration.RetryDelay));
+        Func<int, TimeSpan> sleepDurationProvider = i => TimeSpan.FromMilliseconds(i * (retryPolicy.OverrideRetryDelay ? retryPolicy.RetryDelay : _configuration.RetryDelay));
 
         return await Policy.Handle<Exception>()
-            .WaitAndRetryAsync(retryPolicy.RetryCount ?? _configuration.RetryCount, sleepDurationProvider, OnRetry)
+            .WaitAndRetryAsync(retryPolicy.OverrideRetryCount ? retryPolicy.RetryCount : _configuration.RetryCount, sleepDurationProvider, OnRetry)
             .ExecuteAsync(async _ => await next(), cancellationToken);
     }
 
