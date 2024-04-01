@@ -135,3 +135,6 @@ public class GetUserByName : IRequest<User?>
     public string Name { get; set; }
 }
 ```
+
+### When to use it?
+For example, when you call on external resources and the infrastructure can sometimes have temporarey failures.
