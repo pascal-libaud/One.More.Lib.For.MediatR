@@ -1,4 +1,3 @@
-
 One More Lib For MediatR
 ========================
 [![CI](https://github.com/pascal-libaud/One.More.Lib.For.MediatR/actions/workflows/ci.yml/badge.svg)](https://github.com/pascal-libaud/One.More.Lib.For.MediatR/actions/workflows/ci.yml) [![NuGet](https://img.shields.io/nuget/v/One.More.Lib.For.MediatR.svg)](https://www.nuget.org/packages/One.More.Lib.For.MediatR/)
@@ -48,9 +47,18 @@ The simplest way:
 builder.Services.AddMediatRExtensions(configuration => configuration.MemoryCacheSupport = true);
 ```
 
-If you want to configure it:
+If you want a complete configuration:
 ```csharp
 builder.Services.AddMediatRExtensions(configuration => configuration.AddMemoryCacheSupport(slidingExpiration: TimeSpan.FromMinutes(10), priority: CacheItemPriority.Low));
+```
+
+Or create a specific configuration for a given request:
+```csharp
+builder.Services.AddMediatRExtensions(cfg =>
+{
+  cfg.AddMemoryCacheSupport(slidingExpiration: TimeSpan.FromMinutes(10), priority: CacheItemPriority.Low);
+  cfg.AddMemoryCacheSupportOverrideFor<GiveRequest>(priority: CacheItemPriority.High);
+}
 ```
 
 ### How yo use it?
