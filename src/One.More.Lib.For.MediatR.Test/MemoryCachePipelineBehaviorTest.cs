@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Caching.Memory;
+
 namespace One.More.Lib.For.MediatR.Test;
 
 public class MemoryCachePipelineBehaviorTest
@@ -59,6 +61,34 @@ public class MemoryCachePipelineBehaviorTest
         _ = await mediator.Send(new NoMemoryRequest(2));
 
         counter.Count.Should().Be(4);
+    }
+
+    [Fact]
+    public async Task Memory_cache_pipeline_behavior_should_take_account_of_override_configuration()
+    {
+        var mediator = ServiceCollectionBuilder.CreateServiceCollection()
+            .ConfigureMediatR()
+            .ConfigureMemoryCacheDecorator()
+            .ConfigureMemoryCacheAndOverrideFor<MemoryRequest>()
+            .AddSingleton<Counter>()
+            .BuildServiceProvider()
+            .GetRequiredService<Counter>(out var counter)
+            .GetRequiredService<IMemoryCache>(out var spyMemoryCache)
+            .GetMediator();
+
+        _ = await mediator.Send(new MemoryRequest(1));
+        _ = await mediator.Send(new MemoryRequest(2));
+
+        counter.Count.Should().Be(2);
+
+        _ = await mediator.Send(new MemoryRequest(1));
+        _ = await mediator.Send(new MemoryRequest(2));
+
+        counter.Count.Should().Be(2);
+
+        spyMemoryCache.Should().BeAssignableTo<SpyMemoryCache>()
+            .Which.CacheEntries.Should().HaveCount(2)
+            .And.AllSatisfy(x => x.Priority.Should().Be(CacheItemPriority.High));
     }
 }
 

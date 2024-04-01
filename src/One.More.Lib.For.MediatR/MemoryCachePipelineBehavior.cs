@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,11 +12,16 @@ namespace One.More.Lib.For.MediatR;
 public class MemoryCacheAttribute : Attribute
 {
     public bool IsActive { get; set; } = true;
-
-    // TODO Override des propriétés de MemoryCacheConfiguration
 }
 
 internal class MemoryCacheConfiguration
+{
+    internal MemoryCacheItemConfiguration MainConfiguration { get; set; } = new();
+
+    internal Dictionary<Type, MemoryCacheItemConfiguration> OverrideConfigurations { get; set; } = new();
+}
+
+internal class MemoryCacheItemConfiguration
 {
     internal DateTimeOffset? AbsoluteExpiration { get; set; }
 
@@ -47,12 +53,15 @@ internal class MemoryCachePipelineBehavior<TRequest, TResponse> : IPipelineBehav
         if (!_memoryCache.TryGetValue(request, out TResponse result))
         {
             result = await next();
+
+            var conf = _configuration.OverrideConfigurations.GetValueOrDefault(typeof(TRequest), _configuration.MainConfiguration);
+
             _memoryCache.Set(request, result, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = _configuration.AbsoluteExpiration,
-                AbsoluteExpirationRelativeToNow = _configuration.AbsoluteExpirationRelativeToNow,
-                SlidingExpiration = _configuration.SlidingExpiration,
-                Priority = _configuration.Priority,
+                AbsoluteExpiration = conf.AbsoluteExpiration,
+                AbsoluteExpirationRelativeToNow = conf.AbsoluteExpirationRelativeToNow,
+                SlidingExpiration = conf.SlidingExpiration,
+                Priority = conf.Priority,
             });
         }
 

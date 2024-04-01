@@ -7,21 +7,40 @@ public partial class MediatRExtensionConfiguration
 {
     public bool MemoryCacheSupport { get; set; } = false;
 
-    internal DateTimeOffset? AbsoluteExpiration { get; private set; }
+    internal MemoryCacheConfiguration MemoryCacheConfiguration { get; set; } = new();
 
-    internal TimeSpan? AbsoluteExpirationRelativeToNow { get; private set; }
-
-    internal TimeSpan? SlidingExpiration { get; private set; }
-
-    internal CacheItemPriority Priority { get; private set; }
-
-    public MediatRExtensionConfiguration AddMemoryCacheSupport(DateTimeOffset? absoluteExpiration = null, TimeSpan? absoluteExpirationRelativeToNow = null, TimeSpan? slidingExpiration = null, CacheItemPriority priority = CacheItemPriority.Normal)
+    public MediatRExtensionConfiguration AddMemoryCacheSupport(
+        DateTimeOffset? absoluteExpiration = null,
+        TimeSpan? absoluteExpirationRelativeToNow = null,
+        TimeSpan? slidingExpiration = null,
+        CacheItemPriority priority = CacheItemPriority.Normal)
     {
         MemoryCacheSupport = true;
-        AbsoluteExpiration = absoluteExpiration;
-        AbsoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow;
-        SlidingExpiration = slidingExpiration;
-        Priority = priority;
+
+        MemoryCacheConfiguration.MainConfiguration.AbsoluteExpiration = absoluteExpiration;
+        MemoryCacheConfiguration.MainConfiguration.AbsoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow;
+        MemoryCacheConfiguration.MainConfiguration.SlidingExpiration = slidingExpiration;
+        MemoryCacheConfiguration.MainConfiguration.Priority = priority;
+
+        return this;
+    }
+
+    public MediatRExtensionConfiguration AddMemoryCacheSupportOverrideFor<T>(
+        DateTimeOffset? absoluteExpiration = null,
+        TimeSpan? absoluteExpirationRelativeToNow = null,
+        TimeSpan? slidingExpiration = null,
+        CacheItemPriority priority = CacheItemPriority.Normal)
+    {
+        var conf = new MemoryCacheItemConfiguration
+        {
+            AbsoluteExpiration = absoluteExpiration,
+            AbsoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow,
+            SlidingExpiration = slidingExpiration,
+            Priority = priority,
+        };
+
+        if (!MemoryCacheConfiguration.OverrideConfigurations.TryAdd(typeof(T), conf))
+            MemoryCacheConfiguration.OverrideConfigurations[typeof(T)] = conf;
 
         return this;
     }

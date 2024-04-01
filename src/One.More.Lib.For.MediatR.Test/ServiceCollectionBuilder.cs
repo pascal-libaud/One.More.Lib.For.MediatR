@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Caching.Memory;
+
 namespace One.More.Lib.For.MediatR.Test;
 
 public static class ServiceCollectionBuilder
@@ -26,6 +28,23 @@ public static class ServiceCollectionBuilder
             return services.AddMediatRExtensions(cfg => cfg.AddMemoryCacheSupport());
         else
             return services;
+    }
+
+    public static IServiceCollection ConfigureMemoryCacheAndOverrideFor<T>(this IServiceCollection services)
+    {
+        return services.AddMediatRExtensions(cfg =>
+        {
+            cfg.AddMemoryCacheSupport();
+            cfg.AddMemoryCacheSupportOverrideFor<T>(priority: CacheItemPriority.High);
+        });
+    }
+
+    public static IServiceCollection ConfigureMemoryCacheDecorator(this IServiceCollection services)
+    {
+        services.AddOptions();
+        services.AddSingleton<MemoryCache>();
+        services.TryAddSingleton<IMemoryCache, SpyMemoryCache>();
+        return services;
     }
 
     public static IServiceCollection ConfigurePerformanceLogger(this IServiceCollection services, bool active = true)

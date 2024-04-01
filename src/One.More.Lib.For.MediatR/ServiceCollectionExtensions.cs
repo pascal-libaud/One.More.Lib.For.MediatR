@@ -24,13 +24,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddMemoryCache();
 
-            services.AddSingleton(new MemoryCacheConfiguration
-            {
-                AbsoluteExpiration = serviceConfig.AbsoluteExpiration,
-                AbsoluteExpirationRelativeToNow = serviceConfig.AbsoluteExpirationRelativeToNow,
-                Priority = serviceConfig.Priority,
-                SlidingExpiration = serviceConfig.SlidingExpiration,
-            });
+            services.AddSingleton(serviceConfig.MemoryCacheConfiguration);
 
             services.Add(new ServiceDescriptor(typeof(IPipelineBehavior<,>), typeof(MemoryCachePipelineBehavior<,>), serviceConfig.Lifetime));
         }
