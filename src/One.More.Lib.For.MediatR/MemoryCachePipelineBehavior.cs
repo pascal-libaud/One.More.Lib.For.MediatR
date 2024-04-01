@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -16,9 +12,9 @@ public class MemoryCacheAttribute : Attribute
 
 internal class MemoryCacheConfiguration
 {
-    internal MemoryCacheItemConfiguration MainConfiguration { get; set; } = new();
+    internal MemoryCacheItemConfiguration MainConfiguration { get; } = new();
 
-    internal Dictionary<Type, MemoryCacheItemConfiguration> OverrideConfigurations { get; set; } = new();
+    internal Dictionary<Type, MemoryCacheItemConfiguration> OverrideConfigurations { get; } = new();
 }
 
 internal class MemoryCacheItemConfiguration
@@ -32,7 +28,7 @@ internal class MemoryCacheItemConfiguration
     internal CacheItemPriority Priority { get; set; }
 }
 
-internal class MemoryCachePipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+internal class MemoryCachePipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
     private readonly IMemoryCache _memoryCache;
     private readonly MemoryCacheConfiguration _configuration;
@@ -50,7 +46,7 @@ internal class MemoryCachePipelineBehavior<TRequest, TResponse> : IPipelineBehav
         if (memoryPolicy == null || !memoryPolicy.IsActive)
             return await next();
 
-        if (!_memoryCache.TryGetValue(request, out TResponse result))
+        if (!_memoryCache.TryGetValue(request, out TResponse? result))
         {
             result = await next();
 
@@ -65,6 +61,6 @@ internal class MemoryCachePipelineBehavior<TRequest, TResponse> : IPipelineBehav
             });
         }
 
-        return result;
+        return result!;
     }
 }

@@ -2,7 +2,6 @@
 
 public partial class MediatRExtensionConfiguration
 {
-    
     public bool RetrySupport { get; set; } = false;
 
     public int RetryCount { get; set; } = 3;

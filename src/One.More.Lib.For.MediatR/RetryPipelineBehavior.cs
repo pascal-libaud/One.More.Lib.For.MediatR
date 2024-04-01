@@ -1,7 +1,4 @@
-﻿using System;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -20,11 +17,11 @@ public class RetryPolicyAttribute : Attribute
 
 internal class RetryConfiguration
 {
-    internal int RetryCount { get; set; }
-    internal int RetryDelay { get; set; }
+    internal int RetryCount { get; init; }
+    internal int RetryDelay { get; init; }
 }
 
-internal class RetryPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+internal class RetryPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
     private readonly ILogger<RetryPipelineBehavior<TRequest, TResponse>> _logger;
     private readonly RetryConfiguration _configuration;

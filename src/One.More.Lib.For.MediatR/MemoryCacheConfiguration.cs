@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 
 namespace One.More.Lib.For.MediatR;
 
@@ -7,7 +6,7 @@ public partial class MediatRExtensionConfiguration
 {
     public bool MemoryCacheSupport { get; set; } = false;
 
-    internal MemoryCacheConfiguration MemoryCacheConfiguration { get; set; } = new();
+    internal MemoryCacheConfiguration MemoryCacheConfiguration { get; } = new();
 
     public MediatRExtensionConfiguration AddMemoryCacheSupport(
         DateTimeOffset? absoluteExpiration = null,

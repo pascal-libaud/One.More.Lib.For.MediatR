@@ -2,6 +2,8 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+	  <Nullable>enable</Nullable>
+	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Description>One more library for MediatR. It allows you to configure the most commonly used PipelineBehaviors in a very simple way.</Description>
 	  <Authors>Pascal LIBAUD</Authors>
 	  <Company></Company>

@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,10 +6,10 @@ namespace One.More.Lib.For.MediatR;
 
 internal class PerformanceLoggerConfiguration
 {
-    internal int TriggerThreshold { get; set; }
+    internal int TriggerThreshold { get; init; }
 }
 
-internal class PerformanceLoggerPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+internal class PerformanceLoggerPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
     private readonly ILogger<PerformanceLoggerPipelineBehavior<TRequest, TResponse>> _logger;
     private readonly PerformanceLoggerConfiguration _configuration;
